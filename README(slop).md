@@ -23,6 +23,7 @@ type the command name.
 - **Identity / age / study** → the `whoami` section.
 - **Interests** → the `interests` section, one line per area.
 - **Coding** → the `coding` section.
+- **Current work** → the `work` section, one line per project.
 - **Contact** → the `contact` section's `.links` line. Each platform is one `<a>` tag, all on
   a single line. The Discord link has a placeholder ID
   (`https://discord.com/users/000000000000000000`) — replace the zeros with your own Discord
