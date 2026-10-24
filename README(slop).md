@@ -7,11 +7,16 @@ Personal site for **takyon303 (Mia Takyon)**. Plain HTML + CSS, no JavaScript.
 ```
 index.html      the page (all content lives here)
 css/style.css   all styling, organised by section
+js/listening.js injects the live `$ listening` row and keeps it fresh
 favicon.svg     the little icon in the browser tab
 robots.txt      crawler / scraper rules
 sitemap.xml     single-page sitemap
 CNAME           points GitHub Pages at takyon.online
 .nojekyll       tells GitHub Pages to serve files as-is
+
+assets/listening.json          last.fm data the widget is rendered from
+.github/listening.py           fetches last.fm, writes that json (stdlib only)
+.github/workflows/now-playing.yml   5-min cron that runs the fetch and commits the json
 ```
 
 ## Updating content
@@ -25,9 +30,9 @@ type the command name.
 - **Coding** → the `coding` section.
 - **Current work** → the `work` section, one line per project.
 - **Contact** → the `contact` section's `.links` line. Each platform is one `<a>` tag, all on
-  a single line. The Discord link has a placeholder ID
-  (`https://discord.com/users/000000000000000000`) — replace the zeros with your own Discord
-  user ID.
+  a single line.
+- **Listening** → JS-injected `$ listening` row, see "Listening widget" below. Needs
+  `LASTFM_API_KEY` set as a repo secret; without it the row simply doesn't render.
 - **Command names** → the text inside any `<h2 class="cmd">` (e.g. rename `whoami`).
 - **Add a block** → copy a whole `<section class="entry">` and edit it. Nothing else to wire up.
 
@@ -45,6 +50,44 @@ jsDelivr's `@fontsource/iosevka` package is the host. To change weights, add/rem
 third-party requests at all), download the `.woff2` files from
 `https://cdn.jsdelivr.net/npm/@fontsource/iosevka/files/` into `fonts/`, then replace the CDN
 links with your own `@font-face` rules pointing at `fonts/`.
+
+## Listening widget
+
+The `$ listening` row is a live last.fm readout. The api key never reaches the repo or the
+deployed page — it lives only in a GitHub Actions secret:
+
+- `.github/workflows/now-playing.yml` runs every 5 minutes (and on manual dispatch). It calls
+  the last.fm web api with `LASTFM_API_KEY` and rewrites `assets/listening.json` — a tiny
+  `{playing, track, artist, url, uts}` blob, no key anywhere in it. Nothing is committed unless
+  the json actually changed.
+- `js/listening.js` injects the `$ listening` row into the page, polls the json every minute
+  (and on tab focus), computes the "N m / h / d ago" label client-side so it's always current,
+  and removes the row if the json is missing or the fetch fails. No JS visitors simply don't see
+  the row.
+- Because the widget is a same-origin asset, the page makes zero third-party requests — no
+  album art is fetched, nothing is sent to last.fm from the visitor's browser.
+
+Setup:
+1. Create a free api key at `https://www.last.fm/api/account/create`.
+2. Store it as a repo secret (never commit it):
+   ```sh
+   gh secret set LASTFM_API_KEY --body "YOUR_KEY"
+   ```
+   or on github.com → **Settings → Secrets and variables → Actions → New repository secret**,
+   name `LASTFM_API_KEY`.
+3. Trigger the first run, or just wait ≤5 minutes for the cron:
+   ```sh
+   gh workflow run listening --ref main
+   ```
+
+Tweaks:
+- **Cadence** → the `cron:` line in `.github/workflows/now-playing.yml`.
+- **Row content / label format** → `load_track()` in `.github/listening.py` and
+  `widgetSection()` in `js/listening.js`.
+- **Poll rate / no-JS behaviour** → `POLL_MS` and `refresh()` in `js/listening.js`.
+- **Local previews** → `LASTFM_SAMPLE=playing OUTPUT=assets/listening.json python3 .github/listening.py`,
+  then open the site locally (a file:// page can't fetch, so serve it with
+  `python3 -m http.server`).
 
 ## Deploying to GitHub Pages
 
