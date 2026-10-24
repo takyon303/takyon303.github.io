@@ -19,6 +19,8 @@ FAKE = {
 
 
 def load_track():
+    if not API_KEY:
+        return None
     if SAMPLE == "playing":
         return FAKE | {"playing": True, "uts": None}
     if SAMPLE == "idle":
