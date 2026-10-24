@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 import sys
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -37,8 +38,13 @@ def load_track():
         API_URL + "?" + query,
         headers={"User-Agent": "takyon303.github.io/1.0"},
     )
-    with urllib.request.urlopen(request, timeout=20) as response:
-        payload = json.load(response)
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            payload = json.load(response)
+    except urllib.error.HTTPError as error:
+        body = error.read(300).decode("utf-8", "replace")
+        detail = body or error.reason
+        raise RuntimeError(f"HTTP {error.code}: {detail}") from None
 
     tracks = (payload.get("recenttracks") or {}).get("track") or []
     if not tracks:
