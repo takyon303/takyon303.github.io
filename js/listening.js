@@ -53,20 +53,24 @@ function hide() {
 }
 
 async function refresh() {
-  if (document.hidden) {
-    return;
-  }
+  if (document.hidden) return;
+
   try {
-    const response = await fetch(LISTENING_URL, { cache: "no-cache" });
+    const response = await fetch(`${LISTENING_URL}?_=${Date.now()}`, {
+      cache: "no-store"
+    });
+
     if (!response.ok) {
       hide();
       return;
     }
+
     const data = await response.json();
-    if (!data.track) {
+    if (!data || typeof data.track !== "string" || !data.track.trim()) {
       hide();
       return;
     }
+
     show(widgetSection(data));
   } catch {
     hide();
@@ -74,9 +78,8 @@ async function refresh() {
 }
 
 document.addEventListener("visibilitychange", () => {
-  if (!document.hidden) {
-    refresh();
-  }
+  if (!document.hidden) refresh();
 });
+
 setInterval(refresh, POLL_MS);
 refresh();
