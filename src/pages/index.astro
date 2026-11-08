@@ -20,11 +20,61 @@ import "./styles/global.css";
 
   <style is:global>
     html, body {
+      background: #11111b;
       user-select: none;
       -webkit-user-select: none;
     }
 
-    h1.chuj-font {
+    body {
+      --hero-height: clamp(9rem, 34vw, 18rem);
+    }
+
+    .profile {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 48rem;
+      margin-inline: auto;
+      padding: var(--hero-height) 1rem clamp(3rem, 12.5vw, 6.5rem);
+      text-align: center;
+      font-family: "Noto Sans", sans-serif;
+      font-size: clamp(0.75rem, 3.2vw, 1rem);
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .profile .section-title {
+      margin-top: 0.5rem;
+      font-size: clamp(2.25rem, 8.13vw, 3.75rem);
+      font-weight: 400;
+      line-height: 1;
+    }
+
+    .profile .first-title {
+      margin-top: 0;
+    }
+
+    .contact-links, .credit {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    .credit {
+      margin-top: clamp(4rem, 12.5vw, 6.5rem);
+      font-weight: 500;
+    }
+
+    @media (max-width: 40rem) {
+      .page {
+        display: grid;
+        align-items: center;
+      }
+    }
+
+    .chuj-font {
       font-family: "Instrument Serif", serif !important;
       font-style: normal !important;
     }
@@ -43,13 +93,13 @@ import "./styles/global.css";
     }
   </style>
 
-  <body class="min-h-screen flex bg-[#11111b] text-white"> <!--items-center justify-center -->
-    <!--  <h1 class="translate-x-5 translate-y-5 text-4xl font-bold">HAII~~</h1> -->
-
-    <div class="relative min-h-screen w-full">
+  <body class="min-h-screen bg-[#11111b] text-white">
+    <div class="page relative min-h-svh w-full">
       <ASCIIText
         client:load
         text="Haii~"
+        textAreaHeight="var(--hero-height)"
+        textAreaAnchorId="profile"
         asciiFontSize={8}
         colors={["#a855f7", "#ffffff", "#ffd866"]}
         textScale={1.1}
@@ -66,50 +116,37 @@ import "./styles/global.css";
         charset={" .'`^\",:;Il!i~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"}
       />
 
-      <div class="relative z-10">
-        <h1
-          class="text-center mt-15 text-xl font-normal"
-          style="font-family: 'Noto Sans', sans-serif;"
-        >
-          ㅤ
-        </h1>
-
+      <main id="profile" class="profile">
         <TextReveal delay={100} duration={1000}>
-          <h1 class="translate-y-30 text-center mt-20 text-6xl font-normal chuj-font">
+          <h1 class="section-title first-title chuj-font">
             who am i?
           </h1>
         </TextReveal>
 
         <TextReveal delay={250} duration={1100}>
-          <h1
-            class="translate-y-10 text-center mt-20"
-            style="font-family: 'Noto Sans', sans-serif; font-style: normal; font-weight: 800;"
-          >
+          <p>
             takyon303 / eden takyon — 20, logistics student
-          </h1>
+          </p>
         </TextReveal>
 
         <TextReveal delay={100} duration={1000}>
-          <h1 class="translate-y-30 text-center -mt-18 text-6xl font-normal chuj-font">
+          <h2 class="section-title chuj-font">
             interests
-          </h1>
+          </h2>
         </TextReveal>
 
         <TextReveal delay={200} duration={1000}>
-          <h1
-            class="translate-y-10 text-center mt-20"
-            style="font-family: 'Noto Sans', sans-serif; font-style: normal; font-weight: 800;"
-          >
+          <p>
             music — production & listening<br>
             tech — linux, android, hardware<br>
             coding — getting into it
-          </h1>
+          </p>
         </TextReveal>
 
         <TextReveal delay={100} duration={1000}>
-          <h1 class="translate-y-30 text-center -mt-18 text-6xl font-normal chuj-font">
+          <h2 class="section-title chuj-font">
             coding
-          </h1>
+          </h2>
         </TextReveal>
 
         <TextReveal delay={200} duration={1000}>
@@ -119,36 +156,30 @@ import "./styles/global.css";
           >
             chatgpt and claude are walking me through it,<br> as sad as it sounds <br>
             someday i’ll be on my own, and that’s my goal with this.
-          </h1>
+          </p>
         </TextReveal>
 
         <TextReveal delay={100} duration={1000}>
-          <h1 class="translate-y-30 text-center -mt-18 text-6xl font-normal chuj-font">
+          <h2 class="section-title chuj-font">
             work
-          </h1>
+          </h2>
         </TextReveal>
 
         <TextReveal delay={200} duration={1000}>
-          <h1
-            class="translate-y-10 text-center mt-20"
-            style="font-family: 'Noto Sans', sans-serif; font-style: normal; font-weight: 800;"
-          >
+          <p>
             <a class="hover-box" href="https://github.com/takyon303/sonora">sonora</a> — my main focus right now <br />
             <a class="hover-box" href="https://github.com/takyon303/axp.os">axp.os port for g531f</a> — on hold
-          </h1>
+          </p>
         </TextReveal>
 
         <TextReveal delay={100} duration={1000}>
-          <h1 class="translate-y-30 text-center -mt-18 text-6xl font-normal chuj-font">
+          <h2 class="section-title chuj-font">
             contact
-          </h1>
+          </h2>
         </TextReveal>
 
         <TextReveal delay={200} duration={1000}>
-          <div
-            class="translate-y-10 text-center mt-20 flex flex-wrap justify-center items-center gap-3"
-            style="font-family: 'Noto Sans', sans-serif; font-style: normal; font-weight: 800;"
-          >
+          <div class="contact-links">
             <a class="hover-box" href="https://discord.com/users/1558457158138462255">discord</a>
             <a class="hover-box" href="https://t.me/takyon303">telegram</a>
             <a class="hover-box" href="https://github.com/takyon303">github</a>
@@ -156,18 +187,16 @@ import "./styles/global.css";
           </div>
         </TextReveal>
 
-<div class="translate-y-13 text-center mt-20 flex flex-wrap justify-center items-center gap-3">
-  <a
-    class="hover-box"
-    href="https://www.github.com/cfels"
-    style="opacity: 0.5; color: #acddff !important; font-family: 'Noto Sans', sans-serif; font-weight: 500;"
-  >
-    made by moxiu
-  </a>
-</div>
-
-
-      </div>
+        <footer class="credit">
+          <a
+            class="hover-box"
+            href="https://www.github.com/cfels"
+            style="opacity: 0.5; color: #acddff !important;"
+          >
+            made by moxiu
+          </a>
+        </footer>
+      </main>
     </div>
   </body>
 </html>

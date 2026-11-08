@@ -11,6 +11,8 @@ export type ASCIITextProps = {
   textColor?: string;
   colors?: string[];
   textScale?: number;
+  textAreaHeight?: string;
+  textAreaAnchorId?: string;
   blocks?: number;
   waves?: number;
   waveSpeed?: number;
@@ -128,7 +130,7 @@ void main() {
   for (int i = 0; i < RIPPLES; i++) {
     vec4 ripple = uRipples[i];
     if (ripple.w <= 0.0) continue;
-    float radius = ripple.z * max(uSize.x, uSize.y) * 0.75;
+    float radius = ripple.z * length(uSize);
     float gap = abs(distance(center, ripple.xy) - radius);
     float band = max(uCell.y * 3.0, 24.0);
     float strength = (1.0 - smoothstep(0.0, 1.2, ripple.z)) * (1.0 - smoothstep(0.0, band, gap));
@@ -231,6 +233,8 @@ export default function ASCIIText({
   textColor = '#fdf9f3',
   colors = ['#ff6188', '#fc9867', '#ffd866'],
   textScale = 1,
+  textAreaHeight = '288px',
+  textAreaAnchorId,
   blocks = 0.9,
   waves = 1,
   waveSpeed = 1,
@@ -248,6 +252,7 @@ export default function ASCIIText({
 }: ASCIITextProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const textAreaRef = useRef<HTMLDivElement>(null);
   const buildRef = useRef<Build | null>(null);
   const [fallback, setFallback] = useState(false);
   const glyphs = Array.from(charset).length > 1 ? charset : CHARSET;
@@ -274,8 +279,27 @@ export default function ASCIIText({
 
   useEffect(() => {
     const container = containerRef.current;
+    const textArea = textAreaRef.current;
+    const anchor = textAreaAnchorId ? document.getElementById(textAreaAnchorId) : null;
+    if (!container || !textArea || !anchor) return undefined;
+
+    const positionTextArea = () => {
+      const offset = anchor.getBoundingClientRect().top - container.getBoundingClientRect().top;
+      textArea.style.top = `${offset}px`;
+    };
+    const observer = new ResizeObserver(positionTextArea);
+    observer.observe(container);
+    observer.observe(anchor);
+    positionTextArea();
+
+    return () => observer.disconnect();
+  }, [textAreaAnchorId]);
+
+  useEffect(() => {
+    const container = containerRef.current;
     const canvas = canvasRef.current;
-    if (!container || !canvas) return undefined;
+    const textArea = textAreaRef.current;
+    if (!container || !canvas || !textArea) return undefined;
 
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
     const gl = canvas.getContext('webgl2', { alpha: true, premultipliedAlpha: true, antialias: false });
@@ -451,6 +475,12 @@ export default function ASCIIText({
 
       const width = canvas.width;
       const height = canvas.height;
+      const textHeight = Math.min(
+        440,
+        textArea.clientHeight * 1.75,
+        container.clientWidth * 0.9 / (state.textAspect * 0.5 * s.textScale)
+      );
+      const cellSize = Math.max(3, s.cellSize * textHeight / 440);
       gl.viewport(0, 0, width, height);
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
@@ -462,9 +492,9 @@ export default function ASCIIText({
       gl.bindTexture(gl.TEXTURE_2D, glyphTexture);
       gl.uniform1i(uniforms.uGlyphs, 1);
       gl.uniform2f(uniforms.uSize, width, height);
-      gl.uniform1f(uniforms.uTextCenterY, 220 * dpr);
-      gl.uniform1f(uniforms.uTextHeight, 440 * dpr);
-      gl.uniform2f(uniforms.uCell, s.cellSize * 0.62 * dpr, s.cellSize * dpr);
+      gl.uniform1f(uniforms.uTextCenterY, (textArea.offsetTop + textArea.clientHeight * 0.7) * dpr);
+      gl.uniform1f(uniforms.uTextHeight, textHeight * dpr);
+      gl.uniform2f(uniforms.uCell, cellSize * 0.62 * dpr, cellSize * dpr);
       gl.uniform1f(uniforms.uGlyphCount, state.glyphCount);
       gl.uniform1f(uniforms.uTextAspect, state.textAspect);
       gl.uniform1f(uniforms.uPlaneHeight, 0.5 * s.textScale);
@@ -522,7 +552,7 @@ export default function ASCIIText({
     };
     const onDown = (event: PointerEvent) => {
       const s = settingsRef.current;
-      if (!s.interactive || !s.clickRipple || (event.pointerType === 'mouse' && event.button !== 0)) return;
+      if (reduce || !s.interactive || !s.clickRipple || (event.pointerType === 'mouse' && event.button !== 0)) return;
       locate(event);
       state.ripples.push({ x: state.pointerX, y: state.pointerY, age: 0 });
       state.ripples = state.ripples.slice(-RIPPLES);
@@ -531,6 +561,7 @@ export default function ASCIIText({
 
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
+    resizeObserver.observe(textArea);
     const visibility = new IntersectionObserver(entries => {
       state.visible = entries.some(entry => entry.isIntersecting);
       if (state.visible) wake();
@@ -589,23 +620,24 @@ export default function ASCIIText({
       role="img"
     >
       <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full" />
-      {fallback && (
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontFamily,
-            fontWeight,
-            fontSize: `${8 * textScale}vw`,
-            color: textColor
-          }}
-        >
-          {text}
-        </div>
-      )}
+      <div
+        ref={textAreaRef}
+        style={{
+          position: 'absolute',
+          inset: '0 0 auto',
+          height: textAreaHeight,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily,
+          fontWeight,
+          fontSize: `${8 * textScale}vw`,
+          color: textColor
+        }}
+        aria-hidden="true"
+      >
+        {fallback && text}
+      </div>
     </div>
   );
 }
