@@ -1,0 +1,173 @@
+---
+import ASCIIText from "@/components/ASCIIText";
+import TextReveal from "@/components/TextReveal.astro";
+import "./styles/global.css";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/png+jpeg" href="/favicon.jpg" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Takyon</title>
+
+    <!-- for fonts -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Noto+Sans:wght@100..900&display=swap"
+    />
+  </head>
+
+  <style is:global>
+    html, body {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    h1.chuj-font {
+      font-family: "Instrument Serif", serif !important;
+      font-style: normal !important;
+    }
+
+    a.hover-box {
+      color: white;
+      display: inline-block;
+      padding: 2px 2px;
+      text-decoration: none;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    a.hover-box:hover {
+      background-color: white;
+      color: #11111b;
+    }
+  </style>
+
+  <body class="min-h-screen flex bg-[#11111b] text-white"> <!--items-center justify-center -->
+    <!--  <h1 class="translate-x-5 translate-y-5 text-4xl font-bold">HAII~~</h1> -->
+
+    <div class="relative min-h-screen w-full">
+      <ASCIIText
+        client:load
+        text="Haii~"
+        asciiFontSize={8}
+        colors={["#a855f7", "#ffffff", "#ffd866"]}
+        textScale={1.1}
+        blocks={0.9}
+        waves={1}
+        waveSpeed={1}
+        chroma={3}
+        tilt={1}
+        hueShift={2}
+        scramble={0.6}
+        clickRipple={true}
+        idle={true}
+        interactive={true}
+        charset={" .'`^\",:;Il!i~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"}
+      />
+
+      <div class="relative z-10">
+        <h1
+          class="text-center mt-15 text-xl font-normal"
+          style="font-family: 'Noto Sans', sans-serif;"
+        >
+          ㅤ
+        </h1>
+
+        <TextReveal delay={100} duration={1000}>
+          <h1 class="translate-y-30 text-center mt-20 text-6xl font-normal chuj-font">
+            who am i?
+          </h1>
+        </TextReveal>
+
+        <TextReveal delay={250} duration={1100}>
+          <h1
+            class="translate-y-10 text-center mt-20"
+            style="font-family: 'Noto Sans', sans-serif; font-style: normal; font-weight: 800;"
+          >
+            takyon303 / eden takyon — 20, logistics student
+          </h1>
+        </TextReveal>
+
+        <TextReveal delay={100} duration={1000}>
+          <h1 class="translate-y-30 text-center -mt-18 text-6xl font-normal chuj-font">
+            interests
+          </h1>
+        </TextReveal>
+
+        <TextReveal delay={200} duration={1000}>
+          <h1
+            class="translate-y-10 text-center mt-20"
+            style="font-family: 'Noto Sans', sans-serif; font-style: normal; font-weight: 800;"
+          >
+            music — production & listening<br>
+            tech — linux, android, hardware<br>
+            coding — getting into it
+          </h1>
+        </TextReveal>
+
+        <TextReveal delay={100} duration={1000}>
+          <h1 class="translate-y-30 text-center -mt-18 text-6xl font-normal chuj-font">
+            coding
+          </h1>
+        </TextReveal>
+
+        <TextReveal delay={200} duration={1000}>
+          <h1
+            class="translate-y-10 text-center mt-20"
+            style="font-family: 'Noto Sans', sans-serif; font-style: normal; font-weight: 800;"
+          >
+            chatgpt and claude are walking me through it,<br> as sad as it sounds <br>
+            someday i’ll be on my own, and that’s my goal with this.
+          </h1>
+        </TextReveal>
+
+        <TextReveal delay={100} duration={1000}>
+          <h1 class="translate-y-30 text-center -mt-18 text-6xl font-normal chuj-font">
+            work
+          </h1>
+        </TextReveal>
+
+        <TextReveal delay={200} duration={1000}>
+          <h1
+            class="translate-y-10 text-center mt-20"
+            style="font-family: 'Noto Sans', sans-serif; font-style: normal; font-weight: 800;"
+          >
+            <a class="hover-box" href="https://github.com/takyon303/sonora">sonora</a> — my main focus right now <br />
+            <a class="hover-box" href="https://github.com/takyon303/axp.os">axp.os port for g531f</a> — on hold
+          </h1>
+        </TextReveal>
+
+        <TextReveal delay={100} duration={1000}>
+          <h1 class="translate-y-30 text-center -mt-18 text-6xl font-normal chuj-font">
+            contact
+          </h1>
+        </TextReveal>
+
+        <TextReveal delay={200} duration={1000}>
+          <div
+            class="translate-y-10 text-center mt-20 flex flex-wrap justify-center items-center gap-3"
+            style="font-family: 'Noto Sans', sans-serif; font-style: normal; font-weight: 800;"
+          >
+            <a class="hover-box" href="https://discord.com/users/1558457158138462255">discord</a>
+            <a class="hover-box" href="https://t.me/takyon303">telegram</a>
+            <a class="hover-box" href="https://github.com/takyon303">github</a>
+            <a class="hover-box" href="https://www.last.fm/user/takyon303">last.fm</a>
+          </div>
+        </TextReveal>
+
+<div class="translate-y-13 text-center mt-20 flex flex-wrap justify-center items-center gap-3">
+  <a
+    class="hover-box"
+    href="https://www.github.com/cfels"
+    style="opacity: 0.5; color: #acddff !important; font-family: 'Noto Sans', sans-serif; font-weight: 500;"
+  >
+    made by moxiu
+  </a>
+</div>
+
+
+      </div>
+    </div>
+  </body>
+</html>

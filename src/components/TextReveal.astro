@@ -1,0 +1,69 @@
+---
+interface Props {
+  delay?: number;
+  duration?: number;
+  class?: string;
+}
+
+const { delay = 0, duration = 900, class: className = "" } = Astro.props;
+---
+
+<div
+  class:list={["text-reveal", className]}
+  style={`--reveal-delay: ${delay}ms; --reveal-duration: ${duration}ms;`}
+>
+  <slot />
+</div>
+
+<style>
+  .text-reveal {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(25px) scale(0.98);
+    transition:
+      opacity var(--reveal-duration) ease var(--reveal-delay),
+      filter var(--reveal-duration) ease var(--reveal-delay),
+      transform var(--reveal-duration) cubic-bezier(0.22, 1, 0.32, 1) var(--reveal-delay);
+  }
+
+  .text-reveal.visible {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .text-reveal {
+      opacity: 1;
+      filter: none;
+      transform: none;
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  function initTextReveal() {
+    const elements = document.querySelectorAll<HTMLElement>(".text-reveal:not(.visible)");
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) {
+      elements.forEach((element) => element.classList.add("visible"));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.1 }
+    );
+    elements.forEach((element) => observer.observe(element));
+  }
+
+  initTextReveal();
+  document.addEventListener("astro:page-load", initTextReveal);
+</script>
