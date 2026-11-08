@@ -1,8 +1,6 @@
 import datetime
 import json
 import os
-import sys
-import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -19,13 +17,26 @@ FAKE = {
 }
 
 
+def empty_state():
+    return {
+        "playing": False,
+        "track": "",
+        "artist": "",
+        "url": None,
+        "uts": None,
+    }
+
+
 def load_track():
-    if not API_KEY:
-        return None
     if SAMPLE == "playing":
         return FAKE | {"playing": True, "uts": None}
     if SAMPLE == "idle":
-        return FAKE | {"playing": False, "uts": int(datetime.datetime.now(datetime.timezone.utc).timestamp())}
+        return FAKE | {
+            "playing": False,
+            "uts": int(datetime.datetime.now(datetime.timezone.utc).timestamp()),
+        }
+    if not API_KEY:
+        raise RuntimeError("LASTFM_API_KEY is not configured")
 
     query = urllib.parse.urlencode({
         "method": "user.getrecenttracks",
@@ -38,25 +49,29 @@ def load_track():
         API_URL + "?" + query,
         headers={"User-Agent": "takyon303.github.io/1.0"},
     )
-    try:
-        with urllib.request.urlopen(request, timeout=20) as response:
-            payload = json.load(response)
-    except urllib.error.HTTPError as error:
-        body = error.read(300).decode("utf-8", "replace")
-        detail = body or error.reason
-        raise RuntimeError(f"HTTP {error.code}: {detail}") from None
+
+    with urllib.request.urlopen(request, timeout=20) as response:
+        payload = json.load(response)
+
+    if payload.get("error"):
+        raise RuntimeError(f"Last.fm API error {payload['error']}: {payload.get('message', 'unknown error')}")
 
     tracks = (payload.get("recenttracks") or {}).get("track") or []
     if not tracks:
-        return None
+        return empty_state()
 
     entry = tracks[0]
     artist = entry.get("artist")
     artist = artist.get("#text") if isinstance(artist, dict) else artist
     date = entry.get("date") or {}
+
+    track = entry.get("name") or ""
+    if not track:
+        return empty_state()
+
     return {
         "playing": (entry.get("@attr") or {}).get("nowplaying") == "true",
-        "track": entry.get("name") or "",
+        "track": track,
         "artist": artist or "",
         "url": entry.get("url") or None,
         "uts": int(date["uts"]) if date.get("uts") else None,
@@ -67,21 +82,14 @@ def write(track):
     os.makedirs(os.path.dirname(OUT_PATH) or ".", exist_ok=True)
     with open(OUT_PATH, "w", encoding="utf-8") as file:
         json.dump(track, file, separators=(",", ":"), ensure_ascii=False)
+        file.write("\\n")
     print(f"listening: wrote {OUT_PATH}")
 
 
 def main():
-    try:
-        track = load_track()
-    except Exception as error:
-        print(f"listening: {error}", file=sys.stderr)
-        return 0
-    if track and not track.get("track"):
-        track = None
-    if track:
-        write(track)
-    return 0
+    track = load_track()
+    write(track)
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

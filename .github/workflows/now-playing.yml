@@ -1,37 +1,46 @@
 name: listening
 
 on:
+  push:
+    branches: [main]
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-  group: listening
-  cancel-in-progress: true
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-  update:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - name: checkout
+        uses: actions/checkout@v4
 
-      - name: render
+      - name: generate listening data
         run: python3 .github/listening.py
         env:
           LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
           LASTFM_USER: takyon303
           OUTPUT: assets/listening.json
 
-      - name: commit
-        run: |
-          if [[ -n "$(git status --porcelain assets/listening.json)" ]]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add assets/listening.json
-            git commit -m "listening: update"
-            git pull --rebase origin "${GITHUB_REF_NAME:-main}"
-            git push origin "${GITHUB_REF_NAME:-main}"
-          fi
+      - name: configure pages
+        uses: actions/configure-pages@v5
+
+      - name: upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
