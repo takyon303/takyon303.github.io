@@ -1,0 +1,78 @@
+---
+// TEMPORARY disclaimer banner — content lives in src/data/disclaimer.ts
+// (see that file for instructions — you never need to touch this one)
+
+type DisclaimerConfig = {
+  enabled?: boolean;
+  message?: string;
+  link?: string;
+  linkText?: string;
+};
+
+// glob instead of a normal import so that deleting disclaimer.ts
+// doesn't break the build — it just removes the banner
+const mods = import.meta.glob<{ default: DisclaimerConfig }>("/src/data/disclaimer.{ts,js}", {
+  eager: true,
+});
+const config = Object.values(mods)[0]?.default;
+
+const show = !!config?.enabled && !!config?.message?.trim();
+---
+
+{show && (
+  <div class="disclaimer" role="status">
+    <p>{config?.message}</p>
+    {
+      config?.link && (
+        <a class="hover-box" href={config.link} target="_blank" rel="noopener noreferrer">
+          {config.linkText?.trim() || "more info"}
+        </a>
+      )
+    }
+  </div>
+)}
+
+<style>
+  .disclaimer {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.55rem 1rem;
+    background: #ffd866;
+    color: #11111b;
+    font-family: "Noto Sans", sans-serif;
+    font-size: clamp(0.75rem, 3.2vw, 1rem);
+    font-weight: 800;
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  .disclaimer p {
+    margin: 0;
+  }
+
+  /* subtle flash — gently pulses between its normal yellow and a lighter tint */
+  .disclaimer {
+    animation: disclaimer-flash 1.8s ease-in-out infinite alternate;
+  }
+
+  @keyframes disclaimer-flash {
+    from {
+      background-color: #ffd866;
+    }
+    to {
+      background-color: #fff0b8;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .disclaimer {
+      animation: none;
+    }
+  }
+</style>

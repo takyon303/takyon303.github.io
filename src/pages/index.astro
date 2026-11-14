@@ -1,6 +1,7 @@
 ---
 import ASCIIText from "@/components/ASCIIText";
 import GhostFibers from "@/components/GhostFibers";
+import Disclaimer from "@/components/Disclaimer.astro";
 import TextReveal from "@/components/TextReveal.astro";
 import "./styles/global.css";
 ---
@@ -102,6 +103,8 @@ import "./styles/global.css";
   </style>
 
   <body class="min-h-screen bg-[#11111b] text-white">
+    <Disclaimer />
+
     <div class="page relative min-h-svh w-full">
       <div class="ghost-bg" aria-hidden="true">
         <GhostFibers client:load glowColor="#a855f7" />
